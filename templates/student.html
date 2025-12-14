@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    #mycamera {
+        width: 320px;
+        height: 240px;
+        border: 1px solid #c0c0c0;
+    }
+    #photo_qrcode {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    @media screen and (max-width: 768px) {
+        .w3-half {
+            width: 100% !important;
+            display: block;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+
+<div class="w3-row-padding">
+    <div class="w3-half">
+        <div class="w3-container w3-card-2 w3-white">
+            <center>
+                <div id="mycamera"></div>
+            </center>
+
+            <input type="hidden" id="id" name="id" value="{{ student_id }}">
+            <input type="hidden" id="type" name="type" value="{% if student_id %}edit{% else %}add{% endif %}">
+
+            <p>
+                <label><b>IDNO</b></label>
+                <input type="number" id="idno" name="idno" class="w3-input w3-border" value="{{ idno }}">
+            </p>
+            <p>
+                <label><b>LASTNAME</b></label>
+                <input type="text" id="lastname" name="lastname" class="w3-input w3-border" value="{{ lastname }}">
+            </p>
+            <p>
+                <label><b>FIRSTNAME</b></label>
+                <input type="text" id="firstname" name="firstname" class="w3-input w3-border" value="{{ firstname }}">
+            </p>
+            <p>
+                <label><b>COURSE</b></label>
+                <select id="course" name="course" class="w3-select w3-border">
+                    <option value="BSIT" {% if course == 'BSIT' %}selected{% endif %}>INFORMATION TECHNOLOGY</option>
+                    <option value="BSCS" {% if course == 'BSCS' %}selected{% endif %}>COMPUTER SCIENCE</option>
+                    <option value="BSCJ" {% if course == 'BSCJ' %}selected{% endif %}>CRIMINOLOGY</option>
+                    <option value="BSHM" {% if course == 'BSHM' %}selected{% endif %}>HOSPITALITY MANAGEMENT</option>
+                    <option value="BSE" {% if course == 'BSE' %}selected{% endif %}>HOSPITALITY EDUCATION</option>
+                </select>
+            </p>
+            <p>
+                <label><b>LEVEL</b></label>
+                <select id="level" name="level" class="w3-select w3-border">
+                    <option value="1" {% if level=='1' %}selected{% endif %}>FIRST YEAR</option>
+                    <option value="2" {% if level=='2' %}selected{% endif %}>SECOND YEAR</option>
+                    <option value="3" {% if level=='3' %}selected{% endif %}>THIRD YEAR</option>
+                    <option value="4" {% if level=='4' %}selected{% endif %}>FOURTH YEAR</option>
+                </select>
+            </p>
+            <p class="w3-right">
+                <button class="w3-button w3-blue" type="button" onclick="takepicture()">SNAP</button>
+            </p>
+        </div>
+    </div>
+
+    <div class="w3-half">
+		<div class="w3-container w3-padding w3-card-4 w3-white">
+			<center>
+				<div id="photo_qrcode">
+					<div>
+						<img id="imageprev" src="{{ url_for('static', filename='images/account.png') }}" width="150" height="150">
+					</div>
+					<div id="qrcode_preview">
+						{% if idno %}
+							<img id="qrcode_img" src="/static/qrcode/{{ idno }}.png" width="250" height="250">
+						{% else %}
+							<img id="qrcode_img" src="/static/qrcode/placeholder.png" width="250" height="250">
+						{% endif %}
+					</div>
+				</div>
+			</center>
+			<br>
+			<table class="w3-table-all">
+				<tr><td><b>IDNO</b></td><td><div id="myidno"></div></td></tr>
+				<tr><td><b>LASTNAME</b></td><td><div id="mylastname"></div></td></tr>
+				<tr><td><b>FIRSTNAME</b></td><td><div id="myfirstname"></div></td></tr>
+				<tr><td><b>COURSE</b></td><td><div id="mycourse"></div></td></tr>
+				<tr><td><b>LEVEL</b></td><td><div id="mylevel"></div></td></tr>
+			</table>
+			<p class="w3-right">
+				<input class="w3-button w3-blue" type="button" value="SAVE" onclick="savestudent()">
+				<input type="button" value="CANCEL" class="w3-button w3-green" onclick="cancel()">
+			</p>
+		</div>
+	</div>
+</div>
+
+<script src="{{ url_for('static',filename='js/webcam.min.js') }}"></script>
+<script>
+Webcam.set({
+    width:320,
+    height:240,
+    dest_width:320,
+    dest_height:240,
+    image_format:'jpeg',
+    jpeg_quality:90
+});
+Webcam.attach('#mycamera');
+
+const qrImg = document.getElementById('qrcode_img');
+const idnoInput = document.getElementById('idno');
+
+function updateQRCode() {
+    const idno = idnoInput.value.trim();
+    if(idno){
+        qrImg.src = "/qrcode?idno=" + encodeURIComponent(idno) + "&t=" + new Date().getTime();
+    } else {
+        qrImg.src = "/static/qrcode/placeholder.png";
+    }
+}
+
+if(idnoInput){
+    idnoInput.addEventListener('input', updateQRCode);
+    updateQRCode();
+}
+
+function takepicture(){
+    Webcam.snap(function(data_uri) {
+        document.getElementById('imageprev').src = data_uri;
+
+        document.getElementById('myidno').innerHTML = idnoInput.value;
+        document.getElementById('mylastname').innerHTML = document.getElementById('lastname').value;
+        document.getElementById('myfirstname').innerHTML = document.getElementById('firstname').value;
+        document.getElementById('mycourse').innerHTML = document.getElementById('course').value;
+        document.getElementById('mylevel').innerHTML = document.getElementById('level').value;
+
+        updateQRCode();
+    });
+}
+
+function savestudent(){
+    var image = document.getElementById('imageprev').src;
+    var idno = document.getElementById('idno').value;
+    var lastname = document.getElementById('lastname').value;
+    var firstname = document.getElementById('firstname').value;
+    var course = document.getElementById('course').value;
+    var level = document.getElementById('level').value;
+    var id = document.getElementById('id').value;
+    var type = document.getElementById('type').value;
+	
+	if (!idno || !lastname || !firstname || !course || !level || !image) {
+        alert("All fields and photo must be filled!");
+        return;
+    }
+
+    Webcam.upload(image, '/savestudent?idno=' + idno + '&lastname=' + lastname + '&firstname=' + firstname + '&course=' + course + '&level=' + level + '&id=' + id + '&type=' + type,
+        function(code, text){
+            alert("Student Information Saved!");
+            window.location.href="/student";
+        }
+    );
+}
+
+function cancel(){
+    document.getElementById('idno').value = '';
+    document.getElementById('lastname').value = '';
+    document.getElementById('firstname').value = '';
+    document.getElementById('course').selectedIndex = 0;
+    document.getElementById('level').selectedIndex = 0;
+
+    document.getElementById('imageprev').src = "{{ url_for('static', filename='images/account.png') }}";
+    document.getElementById('qrcode_img').src = "{{ url_for('static', filename='images/account.png') }}";
+
+    document.getElementById('myidno').innerHTML = '';
+    document.getElementById('mylastname').innerHTML = '';
+    document.getElementById('myfirstname').innerHTML = '';
+    document.getElementById('mycourse').innerHTML = '';
+    document.getElementById('mylevel').innerHTML = '';
+
+    Webcam.attach('#mycamera');
+    window.location.href = "/student";
+}
+</script>
+{% endblock %}

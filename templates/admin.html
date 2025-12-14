@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% block content %}
+
+	<style>
+	.sidebar {
+		width: 250px;
+		background-color: #4B0082; /* Slightly lighter dark for sidebar background */
+		height: calc(100% - 50px);
+		position: fixed;
+		left: -250px;
+		top: 65px;
+		padding: 20px 0;
+		box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+		animation: slideIn 0.5s forwards;
+	}
+	@keyframes slideIn{
+		to{
+			left:0;
+		}
+	}
+
+	.sidebar-toggle {
+		position: absolute;
+		top: 20px;
+		right: -20px;  /* outside sidebar edge */
+		background-color: #4B0082;
+		color: white;
+		width: 20px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 0 5px 5px 0;
+		cursor: pointer;
+		font-weight: bold;
+		transition: transform 0.3s ease;
+	}
+	/* Sidebar hidden state */
+	.sidebar.hidden {
+		transform: translateX(-100%);
+	}
+	.sidebar.hidden .sidebar-toggle {
+		transform: rotate(180deg);
+	}
+	.sidebar-toggle::after {
+		content: ""; /* default arrow points left */
+		font-size: 16px;
+		transition: transform 0.3s ease, content 0.3s ease;
+	}
+	
+	/* Change arrow when sidebar is hidden */
+	.sidebar.hidden .sidebar-toggle::after {
+		content: ""; /* points right when hidden */
+	}
+
+    .sidebar-header {
+        text-align: center;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #333;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+        color: #00e676; /* Green accent color for title */
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-item {
+        margin-bottom: 10px;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 15px 25px;
+        color: #ccc;
+        text-decoration: none;
+        font-size: 18px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background-color: #00e676; /* Green background on hover */
+        color: #1f1f1f; /* Dark text on hover */
+    }
+
+    .logout {
+        margin-top: 40px; /* Space out the logout button */
+    }
+
+    .logout .nav-link {
+        background-color: #333; 
+        color: #fff;
+        border-radius: 5px;
+        text-align: center;
+        margin: 0 25px;
+    }
+
+    .logout .nav-link:hover {
+        background-color: #ff4444;
+        color: #fff;
+    }
+	    .main-content {
+      flex: 1;
+      padding: 32px;
+    }
+    .content-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .main-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    @media (min-width: 1024px) {
+      .grid-layout {
+        grid-template-columns: 1fr 2fr;
+      }
+    }.card {
+      background-color: var(--surface-light);
+      border: 1px solid var(--border-light);
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }.form-card {
+      padding: 24px;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-light-secondary);
+      margin-bottom: 4px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      background-color: #f9fafb;
+      color: var(--text-light-primary);
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px var(--color-primary);
+    }
+    .submit-button {
+      width: 100%;
+      background-color: blue;
+      color: white;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 0.375rem;
+      transition: background-color 0.2s;
+    }
+    .submit-button:hover {
+      background-color: grey;
+    }.table-container {
+      border: 1px solid var(--border-light);
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+    .table-scroll {
+        overflow-x: auto;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+    .table thead {
+      background-color: #f9fafb;
+    }
+    .table th, .table td {
+      padding: 12px 24px;
+      white-space: nowrap;
+    }
+    .table th {
+      font-weight: 500;
+      color: var(--text-light-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .table tbody tr {
+        border-top: 1px solid var(--border-light);
+    }
+    .action-cell {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .action-button {
+      color: var(--text-light-tertiary);
+      transition: color 0.2s;
+    }
+    .action-button .material-symbols-outlined {
+        font-size: 1rem;
+    }
+    .action-button:hover {
+      color: var(--color-primary);
+    }
+    .action-button.delete:hover {
+      color: var(--color-red-500);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+	</style>
+
+	<div class="sidebar">
+    <div class="sidebar-header">
+        <h2 class="sidebar-title">ADMIN</h2>
+		<div id="sidebarToggle" class="sidebar-toggle">◀</div>
+    </div>
+    <ul class="sidebar-nav">
+        <li class="nav-item">
+            <a href="/admin" class="nav-link">User Management</a>
+        </li>
+        <li class="nav-item">
+            <a href="/student" class="nav-link">Student Management</a>
+        </li>
+        <li class="nav-item">
+            <a href="/attendance" class="nav-link">View Attendance</a>
+        </li>
+        <li class="nav-item logout">
+            <a href="/logout" class="nav-link">Logout</a>
+        </li>
+    </ul>
+</div>
+<main class="main-content">
+	<div class="content-wrapper">
+		<h2 class="main-title">User Management</h2>
+			<div class="grid-layout">
+				<div class="form-container">
+					<div class="card form-card">
+						<form method="POST" action="/saveadmin">
+							<input type="hidden" name="id" id="id">
+							<input type="hidden" name="type" id="type" value="add">
+							<div class="form-group">
+								<label class="form-label" for="name">NAME</label>
+								<input class="form-input" id="name" name="name" placeholder="Name" type="name"/>
+							</div>
+							<div class="form-group">
+								<label class="form-label" for="email">EMAIL</label>
+								<input class="form-input" id="email" name="email" placeholder="email" type="email"/>
+							</div>
+							<div class="form-group">
+								<label class="form-label" for="password">PASSWORD</label>
+								<input class="form-input" id="password" name="password" placeholder="password" type="password"/>
+							</div>
+						<p class="w3-right">
+							<input class="w3-button w3-blue" type='submit' value='SAVE'>
+							<input type='button' value='CANCEL' class='w3-button w3-green' onclick='cancel()'>
+						</p>
+						</form>
+					</div>
+				</div>
+				<div class="table-card-container">
+					<div class="card table-container">
+						<div class="table-scroll">
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">ID</th>
+										<th scope="col">Name</th>
+										<th scope="col">Email</th>
+										<th scope="col">Password</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								{% for user in adminlist %}
+										<tr>
+											<td>{{ user['id'] }}</td>
+											<td class="w3-hide-small w3-hide-medium">{{ user['name'].upper() }}</td>
+											<td class="w3-hide-small w3-hide-medium">{{ user['email'] }}</td>
+											<td class="w3-hide-large">
+												{{ user['name'].upper() }},{{ user['email'] }}
+											</td>
+											<td class="w3-hide-small w3-hide-medium">{{ user['password'] }}</td>
+											</td>
+											<td>
+												<button onclick="editadmin('{{user['id']}}', '{{user['name']}}', '{{user['email']}}', '{{user['password']}}')">&#128393;</button>
+												<button onclick="deleteadmin({{ user['id'] }})">&#128465;</button>
+											</td>
+										</tr>
+										{% endfor%}
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script>
+		function deleteadmin(id){
+			var ok=confirm("Delete this Student?");
+				if(ok){
+					location.href="/deleteadmin?id="+id;
+			}
+		}
+		function editadmin(id, name, email, password) {
+			document.getElementById('id').value = id;
+			document.getElementById('name').value = name;
+			document.getElementById('email').value = email;
+			document.getElementById('password').value = password;
+			document.getElementById('type').value = "edit";
+
+			// change submit button text
+			document.querySelector('input[type="submit"]').value = "UPDATE";
+		}	
+		function cancel() {
+		document.getElementById('id').value = "";
+			document.getElementById('name').value = "";
+			document.getElementById('email').value = "";
+			document.getElementById('password').value = "";
+			document.getElementById('type').value = "add";
+			document.querySelector('input[type="submit"]').value = "SAVE";
+		}
+		const sidebar = document.querySelector('.sidebar');
+		const toggle = document.getElementById('sidebarToggle');
+		const mainContent = document.querySelector('.main-content');
+
+		toggle.addEventListener('click', (e) => {
+			e.stopPropagation();
+			sidebar.classList.toggle('hidden');
+			mainContent.classList.toggle('shifted');
+		});
+	</script>
+{% endblock %}

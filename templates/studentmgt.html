@@ -1,0 +1,455 @@
+{% extends 'base.html' %}
+{% block content %}
+
+	<style>
+	.sidebar {
+		width: 250px;
+		background-color: #4B0082; /* Slightly lighter dark for sidebar background */
+		height: calc(100% - 50px);
+		position: fixed;
+		left: -250px;
+		top: 65px;
+		padding: 20px 0;
+		box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+		animation: slideIn 0.5s forwards;
+	}
+	@keyframes slideIn{
+		to{
+			left:0;
+		}
+	}
+
+
+    .sidebar-header {
+        text-align: center;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #333;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+        color: #00e676; /* Green accent color for title */
+        font-size: 24px;
+        margin: 0;
+    }
+
+    .sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-item {
+        margin-bottom: 10px;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 15px 25px;
+        color: #ccc;
+        text-decoration: none;
+        font-size: 18px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background-color: #00e676; /* Green background on hover */
+        color: #1f1f1f; /* Dark text on hover */
+    }
+
+    .logout {
+        margin-top: 40px; /* Space out the logout button */
+    }
+
+    .logout .nav-link {
+        background-color: #333; /* Different background for logout */
+        color: #fff;
+        border-radius: 5px;
+        text-align: center;
+        margin: 0 25px;
+    }
+
+    .logout .nav-link:hover {
+        background-color: #ff4444; /* Red background for logout on hover */
+        color: #fff;
+    }
+	.main-content {
+      flex: 1;
+      padding-bottom: 20px;
+    }
+    .content-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .main-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    @media (min-width: 1024px) {
+      .grid-layout {
+        grid-template-columns: 1fr 2fr;
+      }
+    }.card {
+      background-color: var(--surface-light);
+      border: 1px solid var(--border-light);
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	
+    }
+	.form-card::-webkit-scrollbar{
+	 display: none;
+	}
+	.form-card {
+      max-height: 550px;
+	  overflow-y: auto;
+	  padding: 20px;
+	  box-sizing: border-box;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-light-secondary);
+      margin-bottom: 4px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      background-color: #f9fafb;
+      color: var(--text-light-primary);
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px var(--color-primary);
+    }
+    .submit-button {
+      width: 100%;
+      background-color: blue;
+      color: white;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 0.375rem;
+      transition: background-color 0.2s;
+    }
+    .submit-button:hover {
+      background-color: grey;
+    }.table-container {
+      border: 1px solid var(--border-light);
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+	.table-scroll::-webkit-scrollbar {
+		display: none;
+	}
+    .table-scroll {
+		width: 100%;   
+		height: 500px			
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		overflow-x: auto;  
+		overflow-y: auto;   
+    }
+	.table-scroll table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	.table-scroll thead th {
+		position: sticky;
+		top: 0;
+		background-color: #f9fafb; /* match your header background */
+		z-index: 10;
+	}
+	.table-scroll th, .table-scroll td {
+		white-space: nowrap; /* prevent text wrapping */
+		padding: 50px 60px;
+	}
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+    .table thead {
+      background-color: #f9fafb;
+    }
+    .table th, .table td {
+      padding: 12px 24px;
+      white-space: nowrap;
+    }
+    .table th {
+      font-weight: 500;
+      color: var(--text-light-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .table tbody tr {
+        border-top: 1px solid var(--border-light);
+    }
+    .action-cell {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .action-button {
+      color: var(--text-light-tertiary);
+      transition: color 0.2s;
+    }
+    .action-button .material-symbols-outlined {
+        font-size: 1rem;
+    }
+    .action-button:hover {
+      color: var(--color-primary);
+    }
+    .action-button.delete:hover {
+      color: var(--color-red-500);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+	.add-button {
+        background-color: blue;
+        color: white;
+        font-weight: 600;
+        padding: 6px 16px;
+        border-radius: 0.375rem;
+        transition: background-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.875rem;
+		float: right;
+    }
+    .add-button:hover {
+        background-color: #2563eb;
+    }
+    .add-button .material-symbols-outlined {
+        font-size: 1rem;
+    }
+	.sidebar-toggle {
+		position: absolute;
+		top: 20px;
+		right: -20px;  /* outside sidebar edge */
+		background-color: #4B0082;
+		color: white;
+		width: 20px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 0 5px 5px 0;
+		cursor: pointer;
+		font-weight: bold;
+		transition: transform 0.3s ease;
+	}
+	/* Sidebar hidden state */
+	.sidebar.hidden {
+		transform: translateX(-100%);
+	}
+	.sidebar.hidden .sidebar-toggle {
+		transform: rotate(180deg);
+	}
+	</style>
+
+	<div class="sidebar">
+    <div class="sidebar-header">
+        <h2 class="sidebar-title">ADMIN</h2>
+		<div id="sidebarToggle" class="sidebar-toggle">◀</div>
+    </div>
+    <ul class="sidebar-nav">
+        <li class="nav-item">
+            <a href="/admin" class="nav-link">User Management</a>
+        </li>
+        <li class="nav-item">
+            <a href="/student" class="nav-link">Student Management</a>
+        </li>
+        <li class="nav-item">
+            <a href="/attendance" class="nav-link">View Attendance</a>
+        </li>
+        <li class="nav-item logout">
+            <a href="/logout" class="nav-link">Logout</a>
+        </li>
+    </ul>
+</div>
+<main class="main-content">
+	<div class="content-wrapper">
+	<a href="{{ url_for('addstudent') }}" class="add-button">Add</a>
+		<h2 class="main-title">Student Management</h2>
+			<div class="grid-layout">
+				<div class="form-container">
+					<div class="card form-card">
+						<center>
+						<div style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 20px;">
+							<div id="myresult">
+								<img id="preview" src="{{ url_for('static', filename='images/account.png') }}" width="150" height="150">
+							</div>
+							<div>
+								<img id="view_qrcode" src="{{ url_for('static', filename='qrcode/placeholder.png') }}" width="150" height="150">
+							</div>
+							<br>
+						</div>
+						</center>
+						<form>
+							<div class="form-group">
+								<label class="form-label" for="idno">IDNO</label>
+								<input class="form-input" id="idno" name="idno" placeholder="ID NUMBER" type="text"/>
+							</div>
+							<div class="form-group">
+								<label class="form-label" for="lastname">LASTNAME</label>
+								<input class="form-input" id="lastname" name="lastname" placeholder="LASTNAME" type="text"/>
+							</div>
+							<div class="form-group">
+								<label class="form-label" for="idno">FIRSTNAME</label>
+								<input class="form-input" id="firstname" name="firstname" placeholder="FIRSTNAME" type="text"/>
+							</div>
+							<div class="form-group">
+								<label class="form-label" for="course">COURSE</label>
+								<select id="course" name="course" class="form-input">
+									<option value="BSIT">INFORMATION TECHNOLOGY</option>
+									<option value="BSCS">COMPUTER SCIENCE</option>
+									<option value="BSCJ">CRIMINOLOGY</option>
+									<option value="BSHM">HOSPITALITY MANAGEMENT</option>
+									<option value="BSE">EDUCATION</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label class="form-label" for="level">LEVEL</label>
+								<select id="level" name="level" class="form-input">
+									<option value="1">FIRST YEAR</option>
+									<option value="2">SECOND YEAR</option>
+									<option value="3">THIRD YEAR</option>
+									<option value="4">FOURTH YEAR</option>						
+								</select>
+							</div>
+							<p class="w3-right">
+								<input type="button" value="UPDATE" class="w3-button w3-blue" onclick="updateStudent()">
+								<input type='button' value='CANCEL' class='w3-button w3-green' onclick='cancel()'>
+							</p>
+						</form>
+					</div>
+				</div>
+					<div class="table-card-container">
+						<div class="card table-container">
+							<div class="table-scroll" style="max-height: 400px; overflow-y: auto; overflow-x: auto;">
+								<table class="table">
+									<thead>
+										<tr>
+										<th>IDNO</th>
+											<th class="w3-hide-small w3-hide-medium">LASTNAME</th>
+											<th class="w3-hide-small w3-hide-medium">FIRSTNAME</th>
+											<th class="w3-hide-large">NAME</th>
+											
+											<th class="w3-hide-small w3-hide-medium">COURSE</th>
+											<th class="w3-hide-small w3-hide-medium">LEVEL</th>
+											<th class="w3-hide-large">COURSE&LEVEL</th>
+											
+											<th>ACTION</th>
+										</tr>
+										<input type="hidden" id="student_id" name="student_id">
+									</thead>
+								{% for student in studentslist %}
+									<tr>
+										<td>{{ student['idno'] }}</td>
+										<td class="w3-hide-small w3-hide-medium">{{ student['lastname'].upper() }}</td>
+										<td class="w3-hide-small w3-hide-medium">{{ student['firstname'].upper() }}</td>
+										<td class="w3-hide-large">
+											{{ student['lastname'].upper() }},{{ student['firstname'].upper() }}{}
+										<td class="w3-hide-small w3-hide-medium">{{ student['course'].upper() }}</td>
+										<td class="w3-hide-small w3-hide-medium">{{ student['level'] }}</td>
+										<td class="w3-hide-large">
+											{{ student['course'].upper() }}-{{ student['level'] }}
+										</td>
+										<td>
+											<button onclick="viewstudent('{{ student['idno'] }}','{{ student['lastname'] }}','{{ student['firstname'] }}','{{ student['course'] }}', '{{student['level']}}','{{ student['id'] }}', '{{student['image']}}')">&#128065;</button>
+											<button onclick="deletestudent({{ student['id'] }})">&#128465;</button>
+										</td>
+									</tr>
+								{% endfor%}
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</div>
+<script>
+	function deletestudent(id){
+		var ok=confirm("Delete this Student?");
+			if(ok){
+			location.href="/deletestudent?id="+id;
+		}
+	}
+	function viewstudent(idno, lastname, firstname, course, level, id, image) {
+		document.getElementById("student_id").value = id; // store student DB id
+		document.getElementById("idno").value = idno;
+		document.getElementById("lastname").value = lastname;
+		document.getElementById("firstname").value = firstname;
+		document.getElementById("course").value = course;
+		document.getElementById("level").value = level;
+		
+		const img = document.getElementById("preview");
+		if (!image) {
+		image = "{{ url_for('static',filename='images/account.png') }}";
+			}
+			img.src = image;
+		
+		const qr = document.getElementById("view_qrcode"); // corrected ID
+		qr.src = `/static/qrcode/${idno}.png`;
+	}
+	function cancel() {
+		document.getElementById('idno').value = '';
+		document.getElementById('lastname').value = '';
+		document.getElementById('firstname').value = '';
+		document.getElementById('course').selectedIndex = 0;
+		document.getElementById('level').selectedIndex = 0;
+		document.getElementById('preview').src = "{{ url_for('static', filename='images/account.png') }}";
+		document.getElementById('view_qrcode').src = "{{ url_for('static', filename='qrcode/placeholder.png') }}";
+
+				
+		Webcam.attach('#mycamera');
+	}
+	function updateStudent() {
+    const id = document.getElementById('student_id').value;
+    const idno = document.getElementById('idno').value;
+    const lastname = document.getElementById('lastname').value;
+    const firstname = document.getElementById('firstname').value;
+    const course = document.getElementById('course').value;
+    const level = document.getElementById('level').value;
+
+    const params = new URLSearchParams({
+        id: id,
+        idno: idno,
+        lastname: lastname,
+        firstname: firstname,
+        course: course,
+        level: level
+    });
+
+    window.location.href = '/addstudents?' + params.toString();
+}
+	const sidebar = document.querySelector('.sidebar');
+	const toggle = document.getElementById('sidebarToggle');
+	const mainContent = document.querySelector('.main-content');
+
+	toggle.addEventListener('click', (e) => {
+		e.stopPropagation(); 
+		sidebar.classList.toggle('hidden');
+		mainContent.classList.toggle('shifted');
+	});
+</script>
+{% endblock %}

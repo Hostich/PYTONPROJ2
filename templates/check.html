@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<br>
+<div class="w3-conatainer w3-display-middle">
+<p id="countdown" style="text-align: center">Returning in 3 seconds...</p>
+<br>
+<center>
+	<div id="myresult">
+		<img id="preview" src="{{ student['image'] }}" width="100" height="100">
+	</div>
+</center>
+<br>
+<div class="w3-container w3-padding-32 w3-card-5 w3-border w3-round-large w3-shadow" style="width: 500px; margin:auto;">
+    <table class="w3-table w3-bordered">
+        <tr><td><b>IDNO</b></td><td>{{ student['idno'] }}</td></tr>
+        <tr><td><b>LASTNAME</b></td><td>{{ student['lastname'] }}</td></tr>
+        <tr><td><b>FIRSTNAME</b></td><td>{{ student['firstname'] }}</td></tr>
+        <tr><td><b>COURSE</b></td><td>{{ student['course'] }}</td></tr>
+        <tr><td><b>LEVEL</b></td><td>{{ student['level'] }}</td></tr>
+    </table>
+</div>
+</div>
+<script>
+	let seconds = 3;
+	const countdownEl = document.getElementById("countdown");
+
+	const interval = setInterval(() => {
+		seconds--;
+		countdownEl.textContent = `Returning in ${seconds} seconds...`;
+		if (seconds <= 0) {
+			clearInterval(interval);
+			window.location.href = "/";
+		}
+	}, 1000);
+</script>
+{% endblock %}

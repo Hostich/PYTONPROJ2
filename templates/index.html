@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="w3-container w3-display-middle">
+    <div style="width: 500px" id="reader"></div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<form id="scanForm" action="/record" method="POST">
+    <input type="hidden" name="idno" id="idnoInput">
+</form>
+{% endblock %}

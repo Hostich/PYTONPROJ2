@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/w3.css') }}">
+	<style>
+		body {
+			margin: 0;
+			font-family: Arial, sans-serif;
+		}
+
+		.main-content {
+			margin-left: 200px; /* default for desktop sidebar */
+			padding: 20px;
+			transition: margin-left 0.3s ease;
+		}
+
+		/* Header adjustments */
+		.w3-bar h5 {
+			font-size: 1rem;
+		}
+
+		.flash-container {
+			text-align: center;  /* center the text */
+			margin: 10px 0;      /* spacing above/below */
+		}
+
+		.flash {
+			display: center;  /* shrink to fit text */
+			padding: 16px 20px;
+			border-radius: 5px;
+			font-weight: bold;
+			opacity: 1;
+			transition: opacity 0.5s ease-out;
+		}
+
+		/* Optional: style by category */
+		.flash.error {
+			background-color: #f44336;  /* red */
+			color: white;
+		}
+
+		.flash.success {
+			background-color: #4CAF50;  /* green */
+			color: white;
+		}
+		/* Make sidebar mobile-friendly (hidden by default) */
+		@media screen and (max-width: 768px) {
+			.main-content {
+				margin-left: 0; /* remove sidebar offset */
+				padding: 10px;
+			}
+
+			.w3-bar h5 {
+				font-size: 0.875rem;
+			}
+
+			#logindis {
+				font-size: 0.875rem;
+				padding: 6px 12px;
+			}
+
+			/* Adjust footer for mobile */
+			footer {
+				font-size: 0.8rem;
+				padding: 8px 0;
+			}
+		}
+
+		/* Optional: responsive button */
+		.w3-button {
+			padding: 8px 16px;
+			font-size: 0.9rem;
+		}
+	</style>
+</head>
+<body class="w3-signal-white">
+	<div class="w3-bar w3-indigo w3-container">
+		<h5 class="w3-bar-item">PYTHON(20420) 10:30 - 12:01</h5>
+		<div class="w3-padding-16 w3-right">
+			{% if not session.get('email') %}
+				<button id="logindis" class="w3-button w3-indigo">LOGIN</button>
+			{% endif %}
+		</div>
+	</div>
+	<script src="{{ url_for('static',filename='js/html5-qrcode.min.js') }}"></script>
+	<div class="w3-container w3-padding-16 main-content">
+		{% block content %}
+		{% endblock %}
+		<div class="w3-center w3-padding-small w3-display-bottommiddle">
+		<footer>
+			&copy; copyright, ROLDAN NINO R. CAYAO AND EJ SEDON, 2025
+		</footer>
+		</div>
+	</div>
+	<script>
+		let hasScanned = false;
+
+		function onScanSuccess(decodedText) {
+			if (hasScanned) return;
+			hasScanned = true;
+
+			document.getElementById("idnoInput").value = decodedText;
+			document.getElementById("scanForm").submit();
+		}
+
+		window.addEventListener("DOMContentLoaded", () => {
+			const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+			html5QrcodeScanner.render(onScanSuccess);
+			
+			const flashes = document.querySelectorAll(".flash");
+			flashes.forEach(flash => {
+				setTimeout(() => {
+					flash.style.opacity = 0;
+					setTimeout(() => flash.remove(), 500);
+				}, 3000);
+			});
+		});
+		const btn = document.getElementById("logindis");
+		const path = window.location.pathname;
+
+		if (btn) {  
+			if (path.includes("/login") || path.includes("/getstudent")) {
+				btn.style.display = "none";
+			} else {
+				btn.addEventListener("click", () => {
+					window.location.href = "/login";
+				});
+			}
+		}
+	</script>
+	
+</body>
+</html>
